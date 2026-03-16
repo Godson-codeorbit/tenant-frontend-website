@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PropNest – Property Management System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════
+     LOGIN PAGE
+════════════════════════════════════════════════════════ -->
+<div id="login-page">
+  <!-- Decorative orbs -->
+  <div class="login-orb" style="width:500px;height:500px;background:radial-gradient(circle,rgba(59,130,246,0.06),transparent 70%);top:-120px;right:-120px;"></div>
+  <div class="login-orb" style="width:400px;height:400px;background:radial-gradient(circle,rgba(139,92,246,0.05),transparent 70%);bottom:-100px;left:-100px;"></div>
+
+  <div class="login-box fade-up">
+    <div class="login-brand">
+      <div class="big"><span>Prop</span>Nest</div>
+      <div class="sub">Property Management System</div>
+    </div>
+
+    <div class="card">
+      <div class="syne" style="font-size:18px;font-weight:700;margin-bottom:5px;">Welcome back</div>
+      <div style="color:var(--muted);font-size:13px;margin-bottom:22px;">Sign in to access your portal</div>
+
+      <div class="role-toggle">
+        <button class="role-btn active" id="role-admin" onclick="setRole('admin')">🏢 Admin</button>
+        <button class="role-btn" id="role-tenant" onclick="setRole('tenant')">🏠 Tenant</button>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" id="login-email" placeholder="you@example.com" value="admin@propnest.co.ke"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" id="login-pass" placeholder="••••••••" value="password123"/>
+      </div>
+
+      <div class="login-error" id="login-error"></div>
+
+      <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="doLogin()">Sign In →</button>
+      <div class="login-hint">Demo: type any password with 6+ characters</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     MAIN APP
+════════════════════════════════════════════════════════ -->
+<div id="app" style="display:none;">
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div class="sidebar-logo">
+      <div class="brand"><span>Prop</span>Nest</div>
+      <div class="tagline">Property Management</div>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-avatar">👤</div>
+      <div>
+        <div class="user-name" id="sb-name">Admin</div>
+        <div class="user-role" id="sb-role">Landlord</div>
+      </div>
+    </div>
+    <nav id="nav">
+      <button class="nav-item active" data-page="dashboard" onclick="goPage('dashboard',this)">
+        <span class="nav-icon">⊞</span><span class="nav-label">Dashboard</span><span class="nav-dot" id="nd-dashboard"></span>
+      </button>
+      <button class="nav-item admin-only" data-page="apartments" onclick="goPage('apartments',this)">
+        <span class="nav-icon">🏢</span><span class="nav-label">Apartments</span>
+      </button>
+      <button class="nav-item admin-only" data-page="tenants" onclick="goPage('tenants',this)">
+        <span class="nav-icon">👥</span><span class="nav-label">Tenants</span>
+      </button>
+      <button class="nav-item" data-page="payments" onclick="goPage('payments',this)">
+        <span class="nav-icon">💳</span><span class="nav-label">Payments</span>
+      </button>
+      <button class="nav-item" data-page="maintenance" onclick="goPage('maintenance',this)">
+        <span class="nav-icon">🔧</span><span class="nav-label">Maintenance</span>
+      </button>
+      <button class="nav-item admin-only" data-page="expenses" onclick="goPage('expenses',this)">
+        <span class="nav-icon">📊</span><span class="nav-label">Expenses</span>
+      </button>
+      <button class="nav-item admin-only" data-page="reports" onclick="goPage('reports',this)">
+        <span class="nav-icon">📈</span><span class="nav-label">Reports</span>
+      </button>
+      <button class="nav-item admin-only" data-page="messages" onclick="goPage('messages',this)">
+        <span class="nav-icon">💬</span><span class="nav-label">Messages</span>
+      </button>
+      <button class="nav-item" data-page="portal" onclick="goPage('portal',this)">
+        <span class="nav-icon">🏠</span><span class="nav-label">Tenant Portal</span>
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <button onclick="doLogout()">⏻ <span>Sign Out</span></button>
+    </div>
+  </aside>
+
+  <!-- MAIN WRAP -->
+  <div id="main-wrap">
+
+    <!-- TOPBAR -->
+    <div id="topbar">
+      <div id="topbar-title" class="syne">Dashboard</div>
+      <div style="position:relative;">
+        <button class="notif-btn" id="notif-btn" onclick="toggleNotif(event)">🔔
+          <span class="notif-badge">4</span>
+        </button>
+        <div id="notif-dropdown">
+          <div class="notif-head">Notifications</div>
+          <div class="notif-item"><span class="activity-icon">⚠️</span><div><div class="notif-msg">Brian Mwangi (B-202) rent is overdue</div><div class="notif-time">2h ago</div></div></div>
+          <div class="notif-item"><span class="activity-icon">ℹ️</span><div><div class="notif-msg">New maintenance request from A-203</div><div class="notif-time">5h ago</div></div></div>
+          <div class="notif-item"><span class="activity-icon">✅</span><div><div class="notif-msg">David Kamau paid KES 45,000</div><div class="notif-time">1d ago</div></div></div>
+          <div class="notif-item"><span class="activity-icon">⚠️</span><div><div class="notif-msg">Esther Wanjiku (B-103) 3 days overdue</div><div class="notif-time">3d ago</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE CONTENT -->
+    <div id="content">
+
+      <!-- ─── DASHBOARD ─────────────────────────────────────── -->
+      <div class="page active" id="page-dashboard">
+        <div class="stat-grid">
+          <div class="card stat-card fade-up d1">
+            <div><div class="stat-label">Total Apartments</div><div class="stat-value" style="color:var(--accent)">3</div><div class="stat-sub">3 buildings registered</div></div>
+            <div class="stat-icon" style="background:rgba(59,130,246,0.12);">🏢</div>
+          </div>
+          <div class="card stat-card fade-up d2">
+            <div><div class="stat-label">Total Tenants</div><div class="stat-value" style="color:var(--purple)">5</div><div class="stat-sub">All active tenants</div></div>
+            <div class="stat-icon" style="background:rgba(139,92,246,0.12);">👥</div>
+          </div>
+          <div class="card stat-card fade-up d3">
+            <div><div class="stat-label">Occupied Rooms</div><div class="stat-value" style="color:var(--green)">5</div><div class="stat-sub">3 vacant rooms</div></div>
+            <div class="stat-icon" style="background:rgba(16,185,129,0.12);">🔑</div>
+          </div>
+          <div class="card stat-card fade-up d4">
+            <div><div class="stat-label">Rent Collected</div><div class="stat-value" style="color:var(--gold)">150K</div><div class="stat-sub">March 2025 · KES</div></div>
+            <div class="stat-icon" style="background:rgba(245,158,11,0.12);">💰</div>
+          </div>
+          <div class="card stat-card fade-up d5">
+            <div><div class="stat-label">Pending Payments</div><div class="stat-value" style="color:var(--red)">2</div><div class="stat-sub">Require follow-up</div></div>
+            <div class="stat-icon" style="background:rgba(239,68,68,0.12);">⏳</div>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <!-- Revenue Chart -->
+          <div class="card fade-up d2">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+              <div class="syne" style="font-weight:700;">Revenue vs Expenses</div>
+              <div style="display:flex;gap:14px;font-size:11px;color:var(--muted);">
+                <span>🔵 Income</span><span>🟡 Expenses</span>
+              </div>
+            </div>
+            <div class="chart-bars" id="dash-chart"></div>
+            <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);display:flex;gap:24px;flex-wrap:wrap;">
+              <div><div style="font-size:11px;color:var(--muted);">Mar Income</div><div class="syne" style="font-weight:700;color:var(--green);">KES 150,000</div></div>
+              <div><div style="font-size:11px;color:var(--muted);">Mar Expenses</div><div class="syne" style="font-weight:700;color:var(--gold);">KES 50,000</div></div>
+              <div><div style="font-size:11px;color:var(--muted);">Net Profit</div><div class="syne" style="font-weight:700;color:var(--accent);">KES 100,000</div></div>
+            </div>
+          </div>
+
+          <!-- Activity -->
+          <div class="card fade-up d3">
+            <div class="syne" style="font-weight:700;margin-bottom:14px;">Recent Activity</div>
+            <div class="activity-item"><span class="activity-icon">⚠️</span><div><div class="activity-msg">Brian Mwangi (B-202) rent is overdue</div><div class="activity-time">2h ago</div></div></div>
+            <div class="activity-item"><span class="activity-icon">ℹ️</span><div><div class="activity-msg">New maintenance request from A-203</div><div class="activity-time">5h ago</div></div></div>
+            <div class="activity-item"><span class="activity-icon">✅</span><div><div class="activity-msg">David Kamau paid KES 45,000</div><div class="activity-time">1d ago</div></div></div>
+            <div class="activity-item"><span class="activity-icon">⚠️</span><div><div class="activity-msg">Esther Wanjiku (B-103) 3 days overdue</div><div class="activity-time">3d ago</div></div></div>
+          </div>
+        </div>
+
+        <!-- Occupancy Grid -->
+        <div class="card fade-up d4">
+          <div class="syne" style="font-weight:700;margin-bottom:14px;">Room Occupancy Overview</div>
+          <div class="occ-grid" id="occ-grid"></div>
+          <div style="display:flex;gap:24px;margin-top:14px;font-size:12px;flex-wrap:wrap;">
+            <span>🔵 Occupied: <strong>5</strong></span>
+            <span>🟢 Vacant: <strong>3</strong></span>
+            <span>Occupancy Rate: <strong>62.5%</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── APARTMENTS ─────────────────────────────────────── -->
+      <div class="page" id="page-apartments">
+        <div class="page-header">
+          <div class="page-sub" id="apt-sub">8 rooms across 3 buildings</div>
+          <button class="btn btn-primary" onclick="togglePanel('apt-form')">+ Add Room</button>
+        </div>
+
+        <div class="card panel" id="apt-form" style="display:none;margin-bottom:18px;">
+          <div class="syne" style="font-weight:700;margin-bottom:14px;">Add New Room</div>
+          <div class="form-grid-3">
+            <div class="form-group"><label class="form-label">Building Name</label><input id="f-apt-bld" placeholder="Sunset Apartments"/></div>
+            <div class="form-group"><label class="form-label">Room Number</label><input id="f-apt-room" placeholder="A-104"/></div>
+            <div class="form-group"><label class="form-label">Floor</label><input id="f-apt-floor" type="number" value="1"/></div>
+            <div class="form-group"><label class="form-label">Rent (KES/month)</label><input id="f-apt-rent" type="number" placeholder="25000"/></div>
+            <div class="form-group"><label class="form-label">Type</label>
+              <select id="f-apt-type"><option>Studio</option><option>1BR</option><option>2BR</option><option>3BR</option></select>
+            </div>
+            <div class="form-group"><label class="form-label">Status</label>
+              <select id="f-apt-status"><option>Vacant</option><option>Occupied</option></select>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="addRoom()">Save Room</button>
+            <button class="btn btn-ghost" onclick="togglePanel('apt-form')">Cancel</button>
+          </div>
+        </div>
+
+        <div id="apt-buildings"></div>
+      </div>
+
+      <!-- ─── TENANTS ────────────────────────────────────────── -->
+      <div class="page" id="page-tenants">
+        <div class="page-header">
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input id="tenant-search" placeholder="Search tenants or rooms…" oninput="renderTenants()"/>
+          </div>
+          <button class="btn btn-primary" onclick="togglePanel('tenant-form')">+ Add Tenant</button>
+        </div>
+
+        <div class="card panel" id="tenant-form" style="display:none;margin-bottom:18px;">
+          <div class="syne" style="font-weight:700;margin-bottom:14px;">New Tenant</div>
+          <div class="form-grid-3">
+            <div class="form-group"><label class="form-label">Full Name</label><input id="f-t-name" placeholder="Amina Okonkwo"/></div>
+            <div class="form-group"><label class="form-label">Phone</label><input id="f-t-phone" placeholder="+254 7XX XXX XXX"/></div>
+            <div class="form-group"><label class="form-label">Email</label><input id="f-t-email" type="email" placeholder="tenant@mail.com"/></div>
+            <div class="form-group"><label class="form-label">ID Number</label><input id="f-t-id" placeholder="A12345678"/></div>
+            <div class="form-group"><label class="form-label">Room Number</label><input id="f-t-room" placeholder="A-101"/></div>
+            <div class="form-group"><label class="form-label">Move-in Date</label><input id="f-t-movein" type="date"/></div>
+            <div class="form-group"><label class="form-label">Lease (months)</label><input id="f-t-lease" type="number" value="12"/></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="addTenant()">Save Tenant</button>
+            <button class="btn btn-ghost" onclick="togglePanel('tenant-form')">Cancel</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Tenant</th><th>Phone</th><th>Room</th><th>Move-In</th><th>Lease</th><th>ID No.</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="tenant-tbody"></tbody>
+            </table>
+            <div class="empty" id="tenant-empty" style="display:none;">No tenants found.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── PAYMENTS ──────────────────────────────────────── -->
+      <div class="page" id="page-payments">
+        <div class="three-col" style="margin-bottom:20px;" id="pay-stats"></div>
+
+        <div class="page-header" style="margin-bottom:14px;">
+          <div class="filter-tabs">
+            <button class="filter-tab active" onclick="filterPayments('All',this)">All</button>
+            <button class="filter-tab" onclick="filterPayments('Paid',this)">Paid</button>
+            <button class="filter-tab" onclick="filterPayments('Pending',this)">Pending</button>
+            <button class="filter-tab" onclick="filterPayments('Overdue',this)">Overdue</button>
+          </div>
+          <button class="btn btn-primary" onclick="togglePanel('pay-form')">+ Record Payment</button>
+        </div>
+
+        <div class="card panel" id="pay-form" style="display:none;margin-bottom:16px;">
+          <div class="syne" style="font-weight:700;margin-bottom:14px;">Record Payment</div>
+          <div class="form-grid-4">
+            <div class="form-group"><label class="form-label">Tenant Name</label><input id="f-p-tenant" placeholder="Tenant name"/></div>
+            <div class="form-group"><label class="form-label">Room</label><input id="f-p-room" placeholder="A-101"/></div>
+            <div class="form-group"><label class="form-label">Amount (KES)</label><input id="f-p-amount" type="number" placeholder="25000"/></div>
+            <div class="form-group"><label class="form-label">Method</label>
+              <select id="f-p-method"><option>M-Pesa</option><option>Bank</option><option>Card</option><option>Cash</option></select>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="addPayment()">Save Payment</button>
+            <button class="btn btn-ghost" onclick="togglePanel('pay-form')">Cancel</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Tenant</th><th>Room</th><th>Amount</th><th>Date</th><th>Method</th><th>Reference</th><th>Status</th></tr></thead>
+              <tbody id="pay-tbody"></tbody>
+            </table>
+            <div class="empty" id="pay-empty" style="display:none;">No payments found.</div>
+          </div>
+          <div class="table-footer"><span id="pay-total" style="font-size:13px;color:var(--muted);"></span></div>
+        </div>
+      </div>
+
+      <!-- ─── MAINTENANCE ───────────────────────────────────── -->
+      <div class="page" id="page-maintenance">
+        <div class="three-col" style="margin-bottom:20px;" id="maint-stats"></div>
+
+        <div class="page-header">
+          <div></div>
+          <button class="btn btn-primary" onclick="togglePanel('maint-form')">+ New Request</button>
+        </div>
+
+        <div class="card panel" id="maint-form" style="display:none;margin-bottom:16px;">
+          <div class="syne" style="font-weight:700;margin-bottom:14px;">Submit Maintenance Request</div>
+          <div class="form-grid-3">
+            <div class="form-group"><label class="form-label">Tenant Name</label><input id="f-m-tenant" placeholder="Your name"/></div>
+            <div class="form-group"><label class="form-label">Room</label><input id="f-m-room" placeholder="A-101"/></div>
+            <div class="form-group"><label class="form-label">Issue Description</label><input id="f-m-issue" placeholder="Describe the problem"/></div>
+            <div class="form-group"><label class="form-label">Category</label>
+              <select id="f-m-cat"><option>Plumbing</option><option>Electricity</option><option>Water</option><option>Repairs</option><option>Security</option><option>Other</option></select>
+            </div>
+            <div class="form-group"><label class="form-label">Priority</label>
+              <select id="f-m-pri"><option>Low</option><option value="Medium" selected>Medium</option><option>High</option></select>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="addMaint()">Submit Request</button>
+            <button class="btn btn-ghost" onclick="togglePanel('maint-form')">Cancel</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Tenant</th><th>Room</th><th>Issue</th><th>Category</th><th>Date</th><th>Priority</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody id="maint-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── EXPENSES ──────────────────────────────────────── -->
+      <div class="page" id="page-expenses">
+        <div style="display:grid;grid-template-columns:320px 1fr;gap:18px;">
+          <div>
+            <div class="card" id="exp-cats" style="margin-bottom:16px;"></div>
+          </div>
+          <div>
+            <div class="page-header">
+              <div class="page-sub" id="exp-sub">Track your property expenses</div>
+              <button class="btn btn-primary" onclick="togglePanel('exp-form')">+ Add Expense</button>
+            </div>
+            <div class="card panel" id="exp-form" style="display:none;margin-bottom:16px;">
+              <div class="syne" style="font-weight:700;margin-bottom:14px;">Add Expense</div>
+              <div class="form-grid-3">
+                <div class="form-group"><label class="form-label">Description</label><input id="f-e-desc" placeholder="Expense description"/></div>
+                <div class="form-group"><label class="form-label">Category</label>
+                  <select id="f-e-cat"><option>Electricity</option><option>Water</option><option>Repairs</option><option>Cleaning</option><option>Security</option><option>Other</option></select>
+                </div>
+                <div class="form-group"><label class="form-label">Amount (KES)</label><input id="f-e-amount" type="number" placeholder="5000"/></div>
+              </div>
+              <div class="btn-row">
+                <button class="btn btn-primary" onclick="addExpense()">Save</button>
+                <button class="btn btn-ghost" onclick="togglePanel('exp-form')">Cancel</button>
+              </div>
+            </div>
+            <div class="card">
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Description</th><th>Category</th><th>Amount</th><th>Date</th><th></th></tr></thead>
+                  <tbody id="exp-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── REPORTS ───────────────────────────────────────── -->
+      <div class="page" id="page-reports">
+        <div class="three-col" id="rep-stats" style="margin-bottom:20px;"></div>
+        <div class="two-col" style="margin-bottom:16px;">
+          <div class="card fade-up d2">
+            <div class="syne" style="font-weight:700;margin-bottom:16px;">Monthly Revenue</div>
+            <div class="chart-bars" id="rep-chart"></div>
+            <div style="margin-top:10px;font-size:12px;color:var(--muted);">🔵 Income &nbsp;·&nbsp; 🟡 Expenses</div>
+          </div>
+          <div class="card fade-up d3">
+            <div class="syne" style="font-weight:700;margin-bottom:10px;">Occupancy Rate</div>
+            <div class="donut-wrap">
+              <div class="donut-container">
+                <svg viewBox="0 0 42 42">
+                  <circle cx="21" cy="21" r="15.915" fill="none" stroke="var(--border)" stroke-width="3"/>
+                  <circle cx="21" cy="21" r="15.915" fill="none" stroke="var(--accent)" stroke-width="3"
+                    stroke-dasharray="62.5 37.5" stroke-dashoffset="0" stroke-linecap="round"/>
+                </svg>
+                <div class="donut-center">
+                  <div class="donut-pct">62.5%</div>
+                  <div class="donut-sub">occupied</div>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;gap:20px;justify-content:center;font-size:13px;flex-wrap:wrap;">
+              <span>🔵 Occupied: <strong>5</strong></span>
+              <span style="color:var(--muted)">⚪ Vacant: <strong>3</strong></span>
+            </div>
+          </div>
+        </div>
+        <div class="card fade-up d4">
+          <div class="syne" style="font-weight:700;margin-bottom:14px;">Outstanding Rent</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Tenant</th><th>Room</th><th>Amount Due</th><th>Due Date</th><th>Status</th></tr></thead>
+              <tbody id="rep-outstanding"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── MESSAGES ──────────────────────────────────────── -->
+      <div class="page" id="page-messages">
+        <div class="page-header">
+          <div class="page-sub" id="msg-sub">0 announcements sent</div>
+          <button class="btn btn-primary" onclick="togglePanel('msg-form')">✉️ New Announcement</button>
+        </div>
+
+        <div class="card panel" id="msg-form" style="display:none;margin-bottom:18px;">
+          <div class="syne" style="font-weight:700;margin-bottom:14px;">Compose Announcement</div>
+          <div class="form-group"><label class="form-label">To</label>
+            <select id="f-msg-to"><option>All Tenants</option><option>Amina Okonkwo</option><option>Brian Mwangi</option><option>Cynthia Njeri</option><option>David Kamau</option><option>Esther Wanjiku</option></select>
+          </div>
+          <div class="form-group"><label class="form-label">Subject</label><input id="f-msg-title" placeholder="Announcement title"/></div>
+          <div class="form-group"><label class="form-label">Message</label><textarea id="f-msg-body" rows="4" placeholder="Write your message here…"></textarea></div>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="addMessage()">Send Announcement</button>
+            <button class="btn btn-ghost" onclick="togglePanel('msg-form')">Cancel</button>
+          </div>
+        </div>
+
+        <div id="msg-list"></div>
+      </div>
+
+      <!-- ─── TENANT PORTAL ─────────────────────────────────── -->
+      <div class="page" id="page-portal">
+        <div class="portal-hero fade-up d1">
+          <div class="portal-avatar">👤</div>
+          <div style="flex:1;">
+            <div class="syne" style="font-weight:800;font-size:20px;">Welcome, Amina Okonkwo!</div>
+            <div style="color:var(--muted);font-size:13px;margin-top:4px;">Room A-101 &nbsp;·&nbsp; Lease: 12 months &nbsp;·&nbsp; Move-in: 2024-01-15</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0;">
+            <div style="font-size:12px;color:var(--muted);">Next Payment Due</div>
+            <div class="syne" style="font-weight:700;font-size:20px;color:var(--gold);">1 Apr 2025</div>
+            <div style="font-size:13px;color:var(--muted);">KES 25,000</div>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <!-- Pay Rent -->
+          <div class="card fade-up d2">
+            <div class="syne" style="font-weight:700;margin-bottom:14px;">💳 Pay Rent</div>
+            <div style="font-size:13px;color:var(--muted);margin-bottom:14px;">Choose a payment method:</div>
+            <button class="pay-method" onclick="alert('Redirecting to M-Pesa payment gateway…')">📱 M-Pesa</button>
+            <button class="pay-method" onclick="alert('Redirecting to Bank Transfer portal…')">🏦 Bank Transfer</button>
+            <button class="pay-method" onclick="alert('Redirecting to Card payment gateway…')">💳 Card Payment</button>
+            <button class="pay-method" onclick="alert('Please visit the office for cash payment.')">💵 Cash (Visit Office)</button>
+          </div>
+
+          <!-- My Payments -->
+          <div class="card fade-up d3">
+            <div class="syne" style="font-weight:700;margin-bottom:14px;">📜 My Payment History</div>
+            <div id="portal-payments"></div>
+          </div>
+        </div>
+
+        <!-- My Maintenance -->
+        <div class="card fade-up d4" style="margin-top:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+            <div class="syne" style="font-weight:700;">🔧 My Maintenance Requests</div>
+            <button class="btn btn-sm btn-ghost" onclick="togglePanel('portal-maint-form')">+ New Request</button>
+          </div>
+          <div class="card" id="portal-maint-form" style="display:none;background:var(--surface);margin-bottom:14px;">
+            <div class="form-grid-2" style="margin-bottom:12px;">
+              <div class="form-group"><label class="form-label">Issue</label><input id="f-pm-issue" placeholder="Describe the problem"/></div>
+              <div class="form-group"><label class="form-label">Category</label>
+                <select id="f-pm-cat"><option>Plumbing</option><option>Electricity</option><option>Water</option><option>Repairs</option></select>
+              </div>
+            </div>
+            <button class="btn btn-sm btn-primary" onclick="submitPortalMaint()">Submit</button>
+          </div>
+          <div id="portal-maint"></div>
+        </div>
+      </div>
+
+    </div><!-- /#content -->
+  </div><!-- /#main-wrap -->
+</div><!-- /#app -->
+<script src="script.js"></script>
+</body>
+</html>
